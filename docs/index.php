@@ -14,38 +14,43 @@ require_once 'Zend/Debug.php';
 // client
 $client = new Zend_Rest_Client('http://localhost:5984');
 
-// get json document
-//$response = $client->restGet('test/7f946f88d4b38b363a26c16bdbc5bc77');
+// compose document
+$document = array();
+$document['title'] = 'document title';
+$document['content'] = 'document content';
 
-// get data in array
-//$arrayData = Zend_Json::decode($response->getBody());
+// JSON-ize document
+$document = Zend_Json::encode($document);
+
+// add document (use POST here)
+$response = $client->restPost('test', $document);
+
+// print response
+Zend_Debug::dump($response);
+
+// get document
+$response = $client->restGet('test/c447a8366d74d880f35720d92d68419e');
+
+// un-Json-ize document
+$document = Zend_Json::decode($response->getBody());
+
+// print document
+Zend_Debug::dump($document);
 
 // change values
-//$arrayData['title'] = '"update!' . time() . '"';
+$document['title'] = '"updated title!"';
 
-// update record
-//$response = $client->restPut('test/7f946f88d4b38b363a26c16bdbc5bc77', Zend_Json::encode($arrayData));
+// update document
+$response = $client->restPut('test/c447a8366d74d880f35720d92d68419e', Zend_Json::encode($document));
 
-/*$arrayData = array();
-$arrayData['title2'] = '"title2"';
-
-// add new record
-$response = $client->restPost('test', Zend_Json::encode($arrayData));
-
-Zend_Debug::dump($response);*/
-
-// get data in array
-//$arrayData = Zend_Json::decode($response->getBody());
+// print response
+Zend_Debug::dump($response);
 
 // get all documents
-//$response = $client->restGet('test/_all_docs');
+$response = $client->restGet('test/_all_docs');
 
-// view
-$viewArray = array();
-$viewArray['map'] = 'function(doc){ if (doc.title) { emit(doc.title, doc); } }';
-
-$response = $client->restPost('test/_temp_view', Zend_Json::encode($viewArray));
-
+// print all docs
 Zend_Debug::dump($response);
-exit();
+
+// next: views
 ?>
